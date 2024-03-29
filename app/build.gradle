@@ -51,6 +51,10 @@ android {
     buildFeatures {
         dataBinding = true
     }
+
+    lint {
+        disable 'UnsafeOptInUsageError'
+    }
 }
 
 dependencies {
@@ -106,6 +110,7 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer-hls:1.1.1"
     implementation "androidx.media3:media3-exoplayer-rtsp:1.1.1"
     implementation "androidx.media3:media3-datasource-rtmp:1.1.1"
+    implementation 'androidx.media3:media3-common:1.1.1'
 
     implementation "com.aliyun.sdk.android:AliyunPlayer:5.5.2.0-full"
     implementation 'com.alivc.conan:AlivcConan:0.9.5'

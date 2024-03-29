@@ -1111,7 +1111,7 @@ public class DetailActivity extends BaseActivity {
         // takagen99 : Additional check for external player
         if (supportsPiPMode() && showPreview && !playFragment.extPlay && Hawk.get(HawkConfig.BACKGROUND_PLAY_TYPE, 0) == 2) {
             // 创建一个Intent对象，模拟按下Home键
-            try { //我的电视上不允许 手动启动 Home
+            try { //部分电视使用该方法启动首页闪退比如小米的澎湃OS
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_HOME);
                 startActivity(intent);
@@ -1120,7 +1120,6 @@ public class DetailActivity extends BaseActivity {
                 ToastUtils.showShort("画中画 开启失败!");
                 return;
             }
-
             // Calculate Video Resolution
             int vWidth = playFragment.mVideoView.getVideoSize()[0];
             int vHeight = playFragment.mVideoView.getVideoSize()[1];
@@ -1134,11 +1133,9 @@ public class DetailActivity extends BaseActivity {
                 ratio = new Rational(16, 9);
             }
             List<android.app.RemoteAction> actions = new ArrayList<>();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                actions.add(generateRemoteAction(android.R.drawable.ic_media_previous, BROADCAST_ACTION_PREV, "Prev", "Play Previous"));
-                actions.add(generateRemoteAction(android.R.drawable.ic_media_play, BROADCAST_ACTION_PLAYPAUSE, "Play", "Play/Pause"));
-                actions.add(generateRemoteAction(android.R.drawable.ic_media_next, BROADCAST_ACTION_NEXT, "Next", "Play Next"));
-            }
+            actions.add(generateRemoteAction(android.R.drawable.ic_media_previous, BROADCAST_ACTION_PREV, "Prev", "Play Previous"));
+            actions.add(generateRemoteAction(android.R.drawable.ic_media_play, BROADCAST_ACTION_PLAYPAUSE, "Play", "Play/Pause"));
+            actions.add(generateRemoteAction(android.R.drawable.ic_media_next, BROADCAST_ACTION_NEXT, "Next", "Play Next"));
             PictureInPictureParams params = new PictureInPictureParams.Builder()
                     .setAspectRatio(ratio)
                     .setActions(actions).build();
