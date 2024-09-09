@@ -1,6 +1,5 @@
 package com.github.tvbox.osc.base;
 
-import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,8 +7,6 @@ import android.os.Looper;
 import androidx.core.os.HandlerCompat;
 import androidx.multidex.MultiDexApplication;
 
-import com.github.catvod.Init;
-import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.JsLoader;
 import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.callback.EmptyCallback;
@@ -19,8 +16,8 @@ import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.util.EpgUtil;
 import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.SubtitleHelper;
@@ -30,10 +27,13 @@ import com.kingja.loadsir.core.LoadSir;
 import com.orhanobut.hawk.Hawk;
 import com.p2p.P2PClass;
 import com.whl.quickjs.android.QuickJSLoader;
+import com.yanzhenjie.andserver.AndServer;
+import com.yanzhenjie.andserver.Server;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import io.github.inflationx.calligraphy3.CalligraphyConfig;
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor;
@@ -52,7 +52,7 @@ public class App extends MultiDexApplication {
     public static String burl;
     private static String dashData;
     public static ViewPump viewPump = null;
-
+    private static Server server = null;
     //线程数
     public static final int THREAD_POOL = 5;
     private final ExecutorService executor;
@@ -60,6 +60,7 @@ public class App extends MultiDexApplication {
     private final Gson mGson = new Gson();
 
     public App() {
+        instance = this;
         executor = Executors.newFixedThreadPool(THREAD_POOL * 2);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
     }
@@ -81,6 +82,7 @@ public class App extends MultiDexApplication {
         if (delayMillis >= 0) get().handler.postDelayed(runnable, delayMillis);
     }
 
+
     public static void removeCallbacks(Runnable runnable) {
         get().handler.removeCallbacks(runnable);
     }
@@ -89,10 +91,10 @@ public class App extends MultiDexApplication {
         for (Runnable r : runnable) get().handler.removeCallbacks(r);
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
         SubtitleHelper.initSubtitleColor(this);
         initParams();
         // takagen99 : Initialize Locale
@@ -216,4 +218,30 @@ public class App extends MultiDexApplication {
     public String getDashData() {
         return dashData;
     }
+
+    public static void startWebserver() {
+        if (server != null) return;
+        server = AndServer
+                .webServer(instance)
+                .port(12345)
+                .timeout(60, TimeUnit.SECONDS)
+                .listener(new Server.ServerListener() {
+                    @Override
+                    public void onStarted() {
+
+                    }
+
+                    @Override
+                    public void onStopped() {
+
+                    }
+
+                    @Override
+                    public void onException(Exception e) {
+
+                    }
+                }).build();
+        server.startup();
+    }
+
 }
